@@ -13,10 +13,11 @@ public class HandlerUtils {
 
     public static final EntryHandler<Map<String, String>> ignoreHandler = new IgnoreEntryHandler();
 
-    public static <T> Map<String, EntryHandler<T>> getTableHandlerMap(List<? extends EntryHandler<T>> entryHandlers) {
-        Map<String, EntryHandler<T>> handlerMap = new ConcurrentHashMap<>();
+    @SuppressWarnings("unchecked")
+    public static Map<String, EntryHandler> getTableHandlerMap(List<? extends EntryHandler> entryHandlers) {
+        Map<String, EntryHandler> handlerMap = new ConcurrentHashMap<>();
         if (entryHandlers != null && !entryHandlers.isEmpty()) {
-            for (EntryHandler<T> handler : entryHandlers) {
+            for (EntryHandler handler : entryHandlers) {
                 String canalTableName = getCanalTableName(handler);
                 if (canalTableName != null) {
                     handlerMap.putIfAbsent(canalTableName, handler);
@@ -34,12 +35,11 @@ public class HandlerUtils {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> EntryHandler<T> getEntryHandler(Map<String, EntryHandler<T>> handlerMap, String database, String table) {
+    public static EntryHandler getEntryHandler(Map<String, EntryHandler> handlerMap, String database, String table) {
         String canalTableName = buildKey(database, table);
-        EntryHandler<T> entryHandler = handlerMap.get(canalTableName);
+        EntryHandler entryHandler = handlerMap.get(canalTableName);
         if (entryHandler == null) {
-            return (EntryHandler<T>) ignoreHandler;
+            return ignoreHandler;
         }
         return entryHandler;
     }
