@@ -3,34 +3,31 @@ package pers.xiaomuma.canal.databind;
 import com.alibaba.otter.canal.protocol.CanalEntry;
 import pers.xiaomuma.canal.databind.factory.IColumnFactory;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
-public class DefaultRowDataHandler implements RowDataHandler<CanalEntry.RowData> {
+public class DefaultRowDataHandler implements RowDataHandler<List<Map<String, String>>>  {
 
-    private IColumnFactory<List<CanalEntry.Column>> columnFactory;
+    private IColumnFactory<Map<String, String>> columnFactory;
 
-    public DefaultRowDataHandler(IColumnFactory<List<CanalEntry.Column>> columnFactory) {
+    public DefaultRowDataHandler(IColumnFactory<Map<String, String>> columnFactory) {
         this.columnFactory = columnFactory;
     }
 
     @Override
-    public <R> void handlerRowData(CanalEntry.RowData rowData, EntryHandler<R> handler, CanalEntry.EventType eventType) {
+    public <R> void handlerRowData(List<Map<String, String>> list, EntryHandler<R> handler, CanalEntry.EventType eventType) {
         switch (eventType) {
             case INSERT:
-                R insertObject = columnFactory.newInstance(handler, rowData.getAfterColumnsList());
-                handler.insert(insertObject);
+                R entry = columnFactory.newInstance(handler, list.iterator().next());
+                handler.insert(entry);
                 break;
             case UPDATE:
-                Set<String> updateColumnSet = rowData.getAfterColumnsList().stream().filter(CanalEntry.Column::getUpdated)
-                        .map(CanalEntry.Column::getName).collect(Collectors.toSet());
-                R before = columnFactory.newInstance(handler, rowData.getBeforeColumnsList(), updateColumnSet);
-                R after = columnFactory.newInstance(handler, rowData.getAfterColumnsList());
+                R before = columnFactory.newInstance(handler, list.get(1));
+                R after = columnFactory.newInstance(handler, list.get(0));
                 handler.update(before, after);
                 break;
             case DELETE:
-                R  deleteObject = columnFactory.newInstance(handler, rowData.getBeforeColumnsList());
-                handler.delete(deleteObject);
+                R o = columnFactory.newInstance(handler, list.iterator().next());
+                handler.delete(o);
                 break;
             default:
                 break;
