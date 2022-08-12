@@ -2,8 +2,8 @@ package pers.xiaomuma.canal.databind.factory;
 
 
 import org.apache.commons.lang3.StringUtils;
-import pers.xiaomuma.canal.databind.DefaultRowDataHandler;
 import pers.xiaomuma.canal.databind.EntryHandler;
+import pers.xiaomuma.canal.databind.IgnoreEntryHandler;
 import pers.xiaomuma.canal.databind.exception.CanalBizException;
 import pers.xiaomuma.canal.databind.utils.EntryUtils;
 import pers.xiaomuma.canal.databind.utils.FieldUtils;
@@ -19,7 +19,7 @@ public class EntryColumnFactory implements IColumnFactory<Map<String, String>> {
     @Override
     @SuppressWarnings("unchecked")
     public <R> R newInstance(EntryHandler<R> handler, Map<String, String> target) throws CanalBizException {
-        if (handler instanceof DefaultRowDataHandler) {
+        if (handler instanceof IgnoreEntryHandler) {
             return (R) target;
         }
         Class<R> tableClass = GenericUtils.getTableClass(handler);
@@ -32,7 +32,7 @@ public class EntryColumnFactory implements IColumnFactory<Map<String, String>> {
     @Override
     @SuppressWarnings("unchecked")
     public <R> R newInstance(EntryHandler<R> handler, Map<String, String> target, Set<String> updateColumn) throws CanalBizException {
-        if (handler instanceof DefaultRowDataHandler) {
+        if (handler instanceof IgnoreEntryHandler) {
             return (R) target;
         }
         try {
